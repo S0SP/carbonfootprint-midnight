@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build --workspace=carbon-credit-ui",
+  "buildCommand": "npm run build --workspace=@midnight-ntwrk/carbon-credit-contract && npm run build --workspace=@midnight-ntwrk/carbon-credit-api && npm run build --workspace=@midnight-ntwrk/carbon-credit-ui",
   "outputDirectory": "carbon-credit-ui/dist",
   "installCommand": "npm install",
   "framework": null,
