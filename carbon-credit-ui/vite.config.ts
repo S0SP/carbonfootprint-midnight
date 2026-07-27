@@ -18,6 +18,8 @@ import react from '@vitejs/plugin-react';
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
 // import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import fs from 'node:fs';
+import path from 'node:path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -68,6 +70,34 @@ export default defineConfig({
           };
         }
         return null;
+      },
+    },
+    // Serve keys and zkir from the contract directory in dev mode
+    {
+      name: 'serve-keys-and-zkir',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = req.url ? new URL(req.url, 'http://localhost').pathname : '';
+          if (url.startsWith('/keys/') || url.startsWith('/zkir/')) {
+            const filePath = path.resolve(__dirname, '..', 'contract', 'src', 'managed', 'carbon-credit', url.slice(1));
+            if (fs.existsSync(filePath)) {
+              const ext = path.extname(filePath);
+              let contentType = 'application/octet-stream';
+              if (ext === '.json') {
+                contentType = 'application/json';
+              } else if (ext === '.zkir' || ext === '.bzkir') {
+                contentType = 'application/octet-stream';
+              }
+              res.writeHead(200, {
+                'Content-Type': contentType,
+                'Access-Control-Allow-Origin': '*',
+              });
+              fs.createReadStream(filePath).pipe(res);
+              return;
+            }
+          }
+          next();
+        });
       },
     },
   ],

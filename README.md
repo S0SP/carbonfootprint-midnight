@@ -15,7 +15,7 @@
 | Preprod | `Pending` |
 | Standalone (Local) | `62d4828f79c82b63c9a329a6c706c9ee2297a977226d1ba20ba174ba22fc3497` |
 
-> **Live Vercel Deployment:** _[Add after Vercel deploy]_
+> **Live Vercel Deployment:** [https://carbonfootprint-midnight.vercel.app/](https://carbonfootprint-midnight.vercel.app/)
 
 ---
 
@@ -230,7 +230,7 @@ No additional coding is required.
 
 ## 🌍 Live Demo (Vercel)
 
-> **Vercel URL:** _[Add after running `vercel --prod` and connecting your wallet]_
+> **Vercel URL:** [https://carbonfootprint-midnight.vercel.app/](https://carbonfootprint-midnight.vercel.app/)
 
 ---
 
