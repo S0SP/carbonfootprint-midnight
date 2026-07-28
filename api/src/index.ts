@@ -206,7 +206,11 @@ export class CarbonCreditAPI implements DeployedCarbonCreditAPI {
    * @returns A `Promise` that resolves with a {@link CarbonCreditAPI} instance that manages the joined
    * {@link DeployedCarbonCreditContract}; or rejects with an error.
    */
-  static async join(providers: CarbonCreditProviders, contractAddress: ContractAddress, logger?: Logger): Promise<CarbonCreditAPI> {
+  static async join(
+    providers: CarbonCreditProviders,
+    contractAddress: ContractAddress,
+    logger?: Logger,
+  ): Promise<CarbonCreditAPI> {
     logger?.info({
       joinContract: {
         contractAddress,

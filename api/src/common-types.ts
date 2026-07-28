@@ -68,7 +68,11 @@ export type CarbonCreditCircuitKeys = Exclude<keyof CarbonCreditContract['impure
  *
  * @public
  */
-export type CarbonCreditProviders = MidnightProviders<CarbonCreditCircuitKeys, PrivateStateId, CarbonCreditPrivateState>;
+export type CarbonCreditProviders = MidnightProviders<
+  CarbonCreditCircuitKeys,
+  PrivateStateId,
+  CarbonCreditPrivateState
+>;
 
 /**
  * A {@link CarbonCreditContract} that has been deployed to the network.

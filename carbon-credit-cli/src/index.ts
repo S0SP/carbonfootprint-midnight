@@ -87,7 +87,11 @@ You can do one of the following:
   3. Exit
 Which would you like to do? `;
 
-const deployOrJoin = async (providers: CarbonCreditProviders, rli: Interface, logger: Logger): Promise<CarbonCreditAPI | null> => {
+const deployOrJoin = async (
+  providers: CarbonCreditProviders,
+  rli: Interface,
+  logger: Logger,
+): Promise<CarbonCreditAPI | null> => {
   let api: CarbonCreditAPI | null = null;
 
   while (true) {
@@ -98,7 +102,11 @@ const deployOrJoin = async (providers: CarbonCreditProviders, rli: Interface, lo
         logger.info(`Deployed contract at address: ${api.deployedContractAddress}`);
         return api;
       case '2':
-        api = await CarbonCreditAPI.join(providers, await rli.question('What is the contract address (in hex)? '), logger);
+        api = await CarbonCreditAPI.join(
+          providers,
+          await rli.question('What is the contract address (in hex)? '),
+          logger,
+        );
         logger.info(`Joined contract at address: ${api.deployedContractAddress}`);
         return api;
       case '3':

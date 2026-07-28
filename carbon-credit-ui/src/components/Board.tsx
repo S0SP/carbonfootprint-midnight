@@ -26,13 +26,17 @@ import {
   Skeleton,
   Typography,
   TextField,
+  Box,
+  Button,
+  Chip,
+  alpha,
 } from '@mui/material';
-import LockIcon from '@mui/icons-material/Lock';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import WriteIcon from '@mui/icons-material/EditNoteOutlined';
-import CopyIcon from '@mui/icons-material/ContentPasteOutlined';
-import StopIcon from '@mui/icons-material/HighlightOffOutlined';
+import LockIcon from '@mui/icons-material/LockOutlined';
+import LockOpenIcon from '@mui/icons-material/LockOpenOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteSweepOutlined';
+import WriteIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import CopyIcon from '@mui/icons-material/ContentCopyOutlined';
+import StopIcon from '@mui/icons-material/ReportGmailerrorredOutlined';
 import { type CarbonCreditDerivedState, type DeployedCarbonCreditAPI } from '../../../api/src/index';
 import { useDeployedBoardContext } from '../hooks';
 import { type BoardDeployment } from '../contexts';
@@ -49,17 +53,6 @@ export interface BoardProps {
 /**
  * Provides the UI for a deployed carbon credit tracker contract; allowing messages to be posted or removed
  * following the rules enforced by the underlying Compact contract.
- *
- * @remarks
- * With no `boardDeployment$` observable, the component will render a UI that allows the user to create
- * or join carbon credit trackers. It requires a `<DeployedBoardProvider />` to be in scope in order to manage
- * these additional boards. It does this by invoking the `resolve(...)` method on the currently in-
- * scope `DeployedBoardContext`.
- *
- * When a `boardDeployment$` observable is received, the component begins by rendering a skeletal view of
- * itself, along with a loading background. It does this until the board deployment receives a
- * `DeployedCarbonCreditAPI` instance, upon which it will then subscribe to its `state$` observable in order
- * to start receiving the changes in the carbon credit tracker state (i.e., when a user posts a new message).
  */
 export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
   const boardApiProvider = useDeployedBoardContext();
@@ -70,18 +63,12 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
   const [messagePrompt, setMessagePrompt] = useState<string>();
   const [isWorking, setIsWorking] = useState(!!boardDeployment$);
 
-  // Two simple callbacks that call `resolve(...)` to either deploy or join a carbon credit tracker
-  // contract. Since the `DeployedBoardContext` will create a new board and update the UI, we
-  // don't have to do anything further once we've called `resolve`.
   const onCreateBoard = useCallback(() => boardApiProvider.resolve(), [boardApiProvider]);
   const onJoinBoard = useCallback(
     (contractAddress: ContractAddress) => boardApiProvider.resolve(contractAddress),
     [boardApiProvider],
   );
 
-  // Callback to handle the posting of a message. The message text is captured in the `messagePrompt`
-  // state, and we just need to forward it to the `recordCredit` method of the `DeployedCarbonCreditAPI` instance
-  // that we received in the `deployedBoardAPI` state.
   const onPostMessage = useCallback(async () => {
     if (!messagePrompt) {
       return;
@@ -99,8 +86,6 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
     }
   }, [deployedBoardAPI, setErrorMessage, setIsWorking, messagePrompt]);
 
-  // Callback to handle the taking down of a message. Again, we simply invoke the `retireCredit` method
-  // of the `DeployedCarbonCreditAPI` instance.
   const onDeleteMessage = useCallback(async () => {
     try {
       if (deployedBoardAPI) {
@@ -120,7 +105,6 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
     }
   }, [deployedBoardAPI]);
 
-  // Subscribes to the `boardDeployment$` observable so that we can receive updates on the deployment.
   useEffect(() => {
     if (!boardDeployment$) {
       return;
@@ -133,9 +117,6 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
     };
   }, [boardDeployment$]);
 
-  // Subscribes to the `state$` observable on a `DeployedCarbonCreditAPI` if we receive one, allowing the
-  // component to receive updates to the change in contract state; otherwise we update the UI to
-  // reflect the error was received instead.
   useEffect(() => {
     if (!boardDeployment) {
       return;
@@ -153,8 +134,6 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
       return;
     }
 
-    // We need the board API as well as subscribing to its `state$` observable, so that we can invoke
-    // the `recordCredit` and `retireCredit` methods later.
     setDeployedBoardAPI(boardDeployment.api);
     const subscription = boardDeployment.api.state$.subscribe(setBoardState);
     return () => {
@@ -163,7 +142,17 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
   }, [boardDeployment, setIsWorking, setErrorMessage, setDeployedBoardAPI]);
 
   return (
-    <Card sx={{ position: 'relative', width: 275, height: 300, minWidth: 275, minHeight: 300 }} color="primary">
+    <Card
+      sx={{
+        position: 'relative',
+        width: '100%',
+        minWidth: 320,
+        minHeight: 380,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+      color="primary"
+    >
       {!boardDeployment$ && (
         <EmptyCardContent onCreateBoardCallback={onCreateBoard} onJoinBoardCallback={onJoinBoard} />
       )}
@@ -171,97 +160,222 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
       {boardDeployment$ && (
         <React.Fragment>
           <Backdrop
-            sx={{ position: 'absolute', color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            sx={{
+              position: 'absolute',
+              color: '#10b981',
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              backgroundColor: 'rgba(6, 11, 9, 0.85)',
+              borderRadius: '20px',
+            }}
             open={isWorking}
           >
-            <CircularProgress data-testid="board-working-indicator" />
+            <CircularProgress data-testid="board-working-indicator" color="primary" />
           </Backdrop>
+
           <Backdrop
-            sx={{ position: 'absolute', color: '#ff0000', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            sx={{
+              position: 'absolute',
+              color: '#ef4444',
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              backgroundColor: 'rgba(6, 11, 9, 0.95)',
+              flexDirection: 'column',
+              gap: 2.5,
+              borderRadius: '20px',
+              px: 3,
+              textAlign: 'center',
+            }}
             open={!!errorMessage}
           >
-            <StopIcon fontSize="large" />
-            <Typography component="div" data-testid="board-error-message">
+            <StopIcon fontSize="large" sx={{ color: '#ef4444' }} />
+            <Typography
+              component="div"
+              data-testid="board-error-message"
+              sx={{ color: '#ef4444', fontWeight: 600, mb: 1, fontFamily: "'Inter', sans-serif" }}
+            >
               {errorMessage}
             </Typography>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setErrorMessage(undefined)}
+              sx={{
+                color: '#ef4444',
+                borderColor: 'rgba(239, 68, 68, 0.4)',
+                '&:hover': { borderColor: '#ef4444', background: 'rgba(239, 68, 68, 0.08)' },
+              }}
+            >
+              Dismiss
+            </Button>
           </Backdrop>
+
           <CardHeader
             avatar={
               boardState ? (
                 boardState.state === State.VACANT || (boardState.state === State.OCCUPIED && boardState.isOwner) ? (
-                  <LockOpenIcon data-testid="recordCredit-unlocked-icon" />
+                  <LockOpenIcon data-testid="recordCredit-unlocked-icon" sx={{ color: '#10b981' }} />
                 ) : (
-                  <LockIcon data-testid="recordCredit-locked-icon" />
+                  <LockIcon data-testid="recordCredit-locked-icon" sx={{ color: '#f59e0b' }} />
                 )
               ) : (
-                <Skeleton variant="circular" width={20} height={20} />
+                <Skeleton variant="circular" width={24} height={24} />
               )
             }
-            titleTypographyProps={{ color: 'primary' }}
-            title={toShortFormatContractAddress(deployedBoardAPI?.deployedContractAddress) ?? 'Loading...'}
+            titleTypographyProps={{
+              sx: {
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 600,
+                color: '#f8fafc',
+                fontSize: '0.95rem',
+              },
+            }}
+            title={toShortFormatContractAddress(deployedBoardAPI?.deployedContractAddress) ?? 'Deploying...'}
             action={
               deployedBoardAPI?.deployedContractAddress ? (
-                <IconButton title="Copy contract address" onClick={onCopyContractAddress}>
+                <IconButton
+                  title="Copy contract address"
+                  onClick={onCopyContractAddress}
+                  sx={{ color: '#94a3b8', '&:hover': { color: '#10b981' } }}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               ) : (
-                <Skeleton variant="circular" width={20} height={20} />
+                <Skeleton variant="circular" width={24} height={24} />
               )
             }
+            sx={{ borderBottom: '1px solid rgba(16, 185, 129, 0.1)', pb: 1.5, pt: 2.5, px: 3 }}
           />
-          <CardContent>
+
+          <CardContent sx={{ flexGrow: 1, pt: 3, pb: 2, px: 3, display: 'flex', flexDirection: 'column' }}>
             {boardState ? (
               boardState.state === State.OCCUPIED ? (
-                <Typography data-testid="board-posted-message" sx={{ minHeight: 160 }} color="primary">
-                  {boardState.message}
-                </Typography>
-              ) : (
-                <TextField
-                  id="message-prompt"
-                  data-testid="board-message-prompt"
-                  variant="outlined"
-                  focused
-                  fullWidth
-                  multiline
-                  minRows={6}
-                  maxRows={6}
-                  placeholder="Message to recordCredit"
-                  size="small"
-                  color="primary"
-                  slotProps={{ htmlInput: { style: { color: 'black' } } }}
-                  onChange={(e) => {
-                    setMessagePrompt(e.target.value);
+                <Box
+                  sx={{
+                    minHeight: 140,
+                    p: 2.5,
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.04)',
+                    border: '1px dashed rgba(16, 185, 129, 0.25)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
                   }}
-                />
+                >
+                  <Typography
+                    data-testid="board-posted-message"
+                    sx={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: '1rem',
+                      lineHeight: 1.5,
+                      color: '#e2e8f0',
+                      wordBreak: 'break-word',
+                      mb: 2,
+                    }}
+                  >
+                    {boardState.message}
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8', fontFamily: "'Outfit', sans-serif" }}>
+                      Seq: #{boardState.sequence}
+                    </Typography>
+                    {boardState.isOwner ? (
+                      <Chip
+                        label="Your Record"
+                        size="small"
+                        sx={{
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                          color: '#10b981',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          borderRadius: '6px',
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="Protected by ZK"
+                        size="small"
+                        sx={{
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                          color: '#f59e0b',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          borderRadius: '6px',
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Typography variant="body2" sx={{ color: '#94a3b8', mb: 0.5, fontFamily: "'Inter', sans-serif" }}>
+                    Record a new carbon credit offset verification.
+                  </Typography>
+                  <TextField
+                    id="message-prompt"
+                    data-testid="board-message-prompt"
+                    variant="outlined"
+                    focused
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    maxRows={4}
+                    placeholder="e.g., Solar farm offset - 500 tonnes CO2"
+                    size="medium"
+                    color="primary"
+                    slotProps={{ htmlInput: { style: { color: '#f8fafc', fontFamily: "'Inter', sans-serif" } } }}
+                    onChange={(e) => {
+                      setMessagePrompt(e.target.value);
+                    }}
+                  />
+                </Box>
               )
             ) : (
-              <Skeleton variant="rectangular" width={245} height={160} />
+              <Skeleton variant="rectangular" width="100%" height={140} sx={{ borderRadius: '12px' }} />
             )}
           </CardContent>
-          <CardActions>
+
+          <CardActions sx={{ px: 3, pb: 3, pt: 1, gap: 1.5 }}>
             {deployedBoardAPI ? (
-              <React.Fragment>
-                <IconButton
-                  title="Record Credit message"
-                  data-testid="board-recordCredit-message-btn"
-                  disabled={boardState?.state === State.OCCUPIED || !messagePrompt?.length}
-                  onClick={onPostMessage}
-                >
-                  <WriteIcon />
-                </IconButton>
-                <IconButton
-                  title="Take down message"
+              boardState?.state === State.OCCUPIED ? (
+                <Button
+                  variant="outlined"
+                  fullWidth
                   data-testid="board-take-down-message-btn"
-                  disabled={
-                    boardState?.state === State.VACANT || (boardState?.state === State.OCCUPIED && !boardState.isOwner)
-                  }
+                  disabled={!boardState.isOwner}
                   onClick={onDeleteMessage}
+                  startIcon={<DeleteIcon />}
+                  sx={{
+                    borderColor: 'rgba(239, 68, 68, 0.4)',
+                    color: '#ef4444',
+                    '&:hover': {
+                      borderColor: '#ef4444',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                    },
+                    '&.Mui-disabled': {
+                      borderColor: 'rgba(255, 255, 255, 0.05)',
+                      color: 'rgba(255, 255, 255, 0.25)',
+                    },
+                  }}
                 >
-                  <DeleteIcon />
-                </IconButton>
-              </React.Fragment>
+                  Retire Carbon Credit
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  data-testid="board-recordCredit-message-btn"
+                  disabled={!messagePrompt?.length}
+                  onClick={onPostMessage}
+                  startIcon={<WriteIcon />}
+                >
+                  Record Carbon Credit
+                </Button>
+              )
             ) : (
-              <Skeleton variant="rectangular" width={80} height={20} />
+              <Skeleton variant="rectangular" width="100%" height={36} sx={{ borderRadius: '12px' }} />
             )}
           </CardActions>
         </React.Fragment>
@@ -272,7 +386,6 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
 
 /** @internal */
 const toShortFormatContractAddress = (contractAddress: ContractAddress | undefined): React.ReactElement | undefined =>
-  // Returns a new string made up of the first, and last, 8 characters of a given contract address.
   contractAddress ? (
     <span data-testid="board-address">
       0x{contractAddress?.replace(/^[A-Fa-f0-9]{6}([A-Fa-f0-9]{8}).*([A-Fa-f0-9]{8})$/g, '$1...$2')}

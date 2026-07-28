@@ -31,7 +31,10 @@ export interface Config {
   readonly generateDust: boolean;
 }
 
-export const currentDir = (import.meta.dirname || new URL('.', import.meta.url).pathname).replace(/^\/([a-zA-Z]:)/, '$1');
+export const currentDir = (import.meta.dirname || new URL('.', import.meta.url).pathname).replace(
+  /^\/([a-zA-Z]:)/,
+  '$1',
+);
 
 export class StandaloneConfig implements Config {
   getEnvironment(logger: Logger): TestEnvironment {
@@ -49,7 +52,13 @@ export class PreviewRemoteConfig implements Config {
     return new PreviewTestEnvironment(logger);
   }
   privateStateStoreName = 'carbon-credit-private-state';
-  logDir = path.resolve(currentDir, '..', 'logs', 'preview-remote', `${new Date().toISOString().replace(/:/g, '-')}.log`);
+  logDir = path.resolve(
+    currentDir,
+    '..',
+    'logs',
+    'preview-remote',
+    `${new Date().toISOString().replace(/:/g, '-')}.log`,
+  );
   zkConfigPath = path.resolve(currentDir, '..', '..', 'contract', 'src', 'managed', 'carbon-credit');
   generateDust = true;
 }
@@ -60,7 +69,13 @@ export class PreprodRemoteConfig implements Config {
     return new PreprodTestEnvironment(logger);
   }
   privateStateStoreName = 'carbon-credit-private-state';
-  logDir = path.resolve(currentDir, '..', 'logs', 'preprod-remote', `${new Date().toISOString().replace(/:/g, '-')}.log`);
+  logDir = path.resolve(
+    currentDir,
+    '..',
+    'logs',
+    'preprod-remote',
+    `${new Date().toISOString().replace(/:/g, '-')}.log`,
+  );
   zkConfigPath = path.resolve(currentDir, '..', '..', 'contract', 'src', 'managed', 'carbon-credit');
   generateDust = true;
 }

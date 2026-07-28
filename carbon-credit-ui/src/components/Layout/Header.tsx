@@ -14,32 +14,81 @@
 // limitations under the License.
 
 import React from 'react';
-import { AppBar, Box } from '@mui/material';
+import { AppBar, Box, Typography, Chip, alpha } from '@mui/material';
+import WifiIcon from '@mui/icons-material/Wifi';
 
 /**
- * A simple application level header for the carbon credit tracker application.
+ * A modern application header for the Carbon Credit Tracker.
  */
 export const Header: React.FC = () => (
   <AppBar
     position="static"
     data-testid="header"
+    elevation={0}
     sx={{
-      backgroundColor: '#000',
+      background: 'rgba(6, 11, 9, 0.75)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(16, 185, 129, 0.12)',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      px: { xs: 3, md: 8 },
+      py: 1.5,
     }}
   >
     <Box
       sx={{
         display: 'flex',
-        px: 10,
-        py: 2.2,
         alignItems: 'center',
+        gap: 2,
       }}
       data-testid="header-logo"
     >
-      <img src="/midnight-logo.png" alt="logo-image" height={66} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          background: 'rgba(255, 255, 255, 0.05)',
+          p: 1,
+          borderRadius: '12px',
+        }}
+      >
+        <img src="/midnight-logo.png" alt="Midnight Logo" height={36} />
+      </Box>
+      <Typography
+        variant="h5"
+        sx={{
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 800,
+          background: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #60a5fa 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          letterSpacing: '-0.5px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        Carbon Credit Tracker
+      </Typography>
+    </Box>
+
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Chip
+        icon={<WifiIcon sx={{ '&&': { color: '#10b981', fontSize: '16px' } }} />}
+        label="Midnight Preprod"
+        variant="outlined"
+        sx={{
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: 600,
+          borderColor: 'rgba(16, 185, 129, 0.25)',
+          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+          color: '#10b981',
+          '& .MuiChip-label': {
+            px: 1.5,
+          },
+        }}
+      />
     </Box>
   </AppBar>
 );

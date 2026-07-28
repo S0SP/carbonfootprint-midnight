@@ -99,7 +99,9 @@ describe("CarbonCredit smart contract", () => {
 
   it("lets a different user recordCredit a message after taking down the first", () => {
     const simulator = new CarbonCreditSimulator(randomBytes(32));
-    simulator.recordCredit("Remember, the past need not become our future as well.");
+    simulator.recordCredit(
+      "Remember, the past need not become our future as well.",
+    );
     simulator.retireCredit();
     simulator.switchUser(randomBytes(32));
     const message = "Joy was more than just an absence of discomfort.";

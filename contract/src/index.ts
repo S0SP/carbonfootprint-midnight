@@ -23,7 +23,10 @@ import * as Witnesses from "./witnesses";
 
 export const CompiledCarbonCreditContractContract = CompiledContract.make<
   CompiledCarbonCreditContract.Contract<Witnesses.CarbonCreditPrivateState>
->("CarbonCredit", CompiledCarbonCreditContract.Contract<Witnesses.CarbonCreditPrivateState>).pipe(
+>(
+  "CarbonCredit",
+  CompiledCarbonCreditContract.Contract<Witnesses.CarbonCreditPrivateState>,
+).pipe(
   CompiledContract.withWitnesses(Witnesses.witnesses),
   CompiledContract.withCompiledFileAssets("./managed/carbon-credit"),
 );

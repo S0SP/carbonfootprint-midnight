@@ -15,7 +15,7 @@
 
 import React, { useState } from 'react';
 import { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
-import { CardActions, CardContent, IconButton, Tooltip, Typography } from '@mui/material';
+import { CardActions, CardContent, IconButton, Tooltip, Typography, Button, Box } from '@mui/material';
 import BoardAddIcon from '@mui/icons-material/PostAddOutlined';
 import CreateBoardIcon from '@mui/icons-material/AddCircleOutlined';
 import JoinBoardIcon from '@mui/icons-material/AddLinkOutlined';
@@ -46,33 +46,73 @@ export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
 
   return (
     <React.Fragment>
-      <CardContent>
-        <Typography align="center" variant="h1" color="primary.dark">
-          <BoardAddIcon fontSize="large" />
+      <CardContent sx={{ pt: 4, pb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            color: '#10b981',
+            mb: 1,
+          }}
+        >
+          <BoardAddIcon sx={{ fontSize: '32px' }} />
+        </Box>
+        <Typography
+          align="center"
+          variant="h5"
+          sx={{
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
+            color: '#f8fafc',
+            letterSpacing: '-0.3px',
+          }}
+        >
+          Manage Carbon Credits
         </Typography>
-        <Typography data-testid="board-posted-message" align="center" variant="body2" color="primary.dark">
-          Create a new Board, or join an existing one...
+        <Typography
+          data-testid="board-posted-message"
+          align="center"
+          variant="body2"
+          sx={{
+            color: '#94a3b8',
+            lineHeight: 1.5,
+            px: 2,
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          Deploy a new tracker contract to record credits, or join an existing contract address.
         </Typography>
       </CardContent>
-      <CardActions disableSpacing sx={{ justifyContent: 'center' }}>
-        <Tooltip title="Create a new board">
-          <IconButton data-testid="board-deploy-btn" onClick={onCreateBoardCallback}>
-            <CreateBoardIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Join an existing board">
-          <IconButton
-            data-testid="board-join-btn"
-            onClick={() => {
-              setTextPromptOpen(true);
-            }}
-          >
-            <JoinBoardIcon />
-          </IconButton>
-        </Tooltip>
+      <CardActions sx={{ flexDirection: 'column', gap: 1.5, px: 3, pb: 4, width: '100%' }}>
+        <Button
+          variant="contained"
+          fullWidth
+          data-testid="board-deploy-btn"
+          startIcon={<CreateBoardIcon />}
+          onClick={onCreateBoardCallback}
+        >
+          Deploy New Board
+        </Button>
+        <Button
+          variant="outlined"
+          fullWidth
+          data-testid="board-join-btn"
+          startIcon={<JoinBoardIcon />}
+          onClick={() => {
+            setTextPromptOpen(true);
+          }}
+        >
+          Join Existing Board
+        </Button>
       </CardActions>
       <TextPromptDialog
-        prompt="Enter contract address"
+        prompt="Enter Carbon Credit Contract Address"
         isOpen={textPromptOpen}
         onCancel={() => {
           setTextPromptOpen(false);

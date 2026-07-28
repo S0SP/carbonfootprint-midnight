@@ -38,45 +38,55 @@ export const TextPromptDialog: React.FC<Readonly<TextPromptDialogProps>> = ({ pr
 
   return (
     <Dialog open={isOpen} onClose={onCancel} fullWidth maxWidth="sm">
-      <DialogTitle>
-        <Typography variant="body1" color="black" data-testid="textprompt-dialog-title">
+      <DialogTitle sx={{ pb: 1, pt: 3, px: 3 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
+            color: '#f8fafc',
+          }}
+          data-testid="textprompt-dialog-title"
+        >
           {prompt}
         </Typography>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ px: 3, py: 1 }}>
         <TextField
           id="text-prompt"
           variant="outlined"
           focused
           fullWidth
-          size="small"
+          size="medium"
           color="primary"
           autoComplete="off"
-          slotProps={{ htmlInput: { style: { color: 'black' } } }}
+          placeholder="0200..."
+          slotProps={{ htmlInput: { style: { color: '#f8fafc', fontFamily: "'Inter', sans-serif" } } }}
           onChange={(e) => {
             setText(e.target.value);
           }}
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
           inputRef={(input) => input?.focus()}
           data-testid="textprompt-dialog-text-prompt"
+          sx={{ mt: 1 }}
         />
       </DialogContent>
 
-      <DialogActions>
-        <Button variant="contained" data-testid="textprompt-dialog-cancel-btn" disableElevation onClick={onCancel}>
+      <DialogActions sx={{ px: 3, pb: 3, pt: 1, gap: 1 }}>
+        <Button variant="outlined" data-testid="textprompt-dialog-cancel-btn" onClick={onCancel} sx={{ px: 3 }}>
           Cancel
         </Button>
         <Button
           variant="contained"
           data-testid="textprompt-dialog-ok-btn"
           disabled={!text.length}
-          disableElevation
           onClick={() => {
             onSubmit(text);
           }}
           type="submit"
+          sx={{ px: 4 }}
         >
-          OK
+          Confirm
         </Button>
       </DialogActions>
     </Dialog>
