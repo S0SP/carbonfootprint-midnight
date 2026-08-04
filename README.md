@@ -12,6 +12,7 @@
 
 | Network | Contract Address |
 |---------|-----------------|
+| Preview | `1a5e1956184064e6676f046e2ca4effcbf868bc89633419cf64de6a007099307` |
 | Preprod | `Pending` |
 | Standalone (Local) | `62d4828f79c82b63c9a329a6c706c9ee2297a977226d1ba20ba174ba22fc3497` |
 

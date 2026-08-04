@@ -16,7 +16,11 @@
 import path from 'node:path';
 import {
   EnvironmentConfiguration,
+  FaucetClient,
   getTestEnvironment,
+  IndexerClient,
+  NodeClient,
+  ProofServerClient,
   RemoteTestEnvironment,
   TestEnvironment,
 } from '@midnight-ntwrk/testkit-js';
@@ -81,9 +85,30 @@ export class PreprodRemoteConfig implements Config {
 }
 
 export class PreviewTestEnvironment extends RemoteTestEnvironment {
-  constructor(logger: Logger) {
-    super(logger);
+  constructor(private readonly log: Logger) {
+    super(log);
   }
+
+  // The base implementation aborts startup when the faucet is unhealthy. The preview faucet is
+  // frequently out of NIGHT ("WALLET_BALANCE_LOW" -> 503) even though the network itself is fine,
+  // and this CLI never calls the faucet anyway - it just waits for funds to arrive. So the faucet
+  // is checked for information only.
+  healthCheck = async (): Promise<void> => {
+    this.log.info('Performing env health check');
+    const env = this.getEnvironmentConfiguration();
+    await new NodeClient(env.node, this.log).health();
+    await new IndexerClient(env.indexer, this.log).health();
+    await new ProofServerClient(env.proofServer, this.log).health();
+    if (env.faucet) {
+      try {
+        await new FaucetClient(env.faucet, this.log).health();
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : 'unknown error';
+        this.log.warn(`Faucet ${env.faucet} is not healthy (${reason}); continuing without it.`);
+        this.log.warn('Fund your wallet address manually - faucet requests are likely to fail.');
+      }
+    }
+  };
 
   private getProofServerUrl(): string {
     const container = this.proofServerContainer as { getUrl(): string } | undefined;
